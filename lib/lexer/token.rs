@@ -4,8 +4,8 @@ pub enum TokenTypes {
     EOF,
 
     // Identifiers + literals
-    IDENT,
-    INT,
+    IDENT(String),
+    INT(String),
 
     // Operators
     ASSIGN,
