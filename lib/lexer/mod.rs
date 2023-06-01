@@ -27,6 +27,34 @@ impl Lexer {
     pub fn next_token(&mut self) -> Token { 
         self.skip_whitespaces();
         let tok =  match self.ch {
+            '+' => Token {
+                tokentype: TokenTypes::PLUS,
+                literal: self.ch.to_string(),
+            },
+            '-' => Token {
+                tokentype: TokenTypes::MINUS,
+                literal: self.ch.to_string(),
+            },
+            '!' => Token {
+                tokentype: TokenTypes::BANG,
+                literal: self.ch.to_string(),
+            },
+            '/' => Token {
+                tokentype: TokenTypes::SLASH,
+                literal: self.ch.to_string(),
+            },
+            '*' => Token {
+                tokentype: TokenTypes::ASTERISK,
+                literal: self.ch.to_string(),
+            },
+            '<' => Token {
+                tokentype: TokenTypes::LT,
+                literal: self.ch.to_string(),
+            },
+            '>' => Token {
+                tokentype: TokenTypes::GT,
+                literal: self.ch.to_string(),
+            },
             '=' => Token {
                 tokentype: TokenTypes::ASSIGN,
                 literal: self.ch.to_string(),
@@ -45,10 +73,6 @@ impl Lexer {
             },
             ',' => Token {
                 tokentype: TokenTypes::COMMA,
-                literal: self.ch.to_string(),
-            },
-            '+' => Token {
-                tokentype: TokenTypes::PLUS,
                 literal: self.ch.to_string(),
             },
             '{' => Token {
@@ -121,6 +145,11 @@ impl Lexer {
         match lit.as_str() {
             "fn" => TokenTypes::FUNCTION,
             "let" => TokenTypes::LET,
+            "true" => TokenTypes::TRUE,
+            "false" => TokenTypes::FALSE,
+            "if" => TokenTypes::IF,
+            "else" => TokenTypes::ELSE,
+            "return" => TokenTypes::RETURN,
             _ => TokenTypes::IDENT(lit.to_string()),
         }
     }
@@ -160,12 +189,21 @@ mod test {
 
     #[test]
     fn test_lexer_2() {
-        let input = "let five = 5;
-                    let ten = 10;
-                    let add = fn(x, y) {
-                        x + y;
-                    };
-                    let result = add(five, ten);";
+        let input = "
+let five = 5;
+let ten = 10;
+   let add = fn(x, y) {
+     x + y;
+};
+   let result = add(five, ten);
+   !-/*5;
+   5 < 10 > 5;
+if (5 < 10) {
+       return true;
+   } else {
+       return false;
+}
+";
 
         let mut lexer = Lexer::new(input);
         let tests = vec![
@@ -205,6 +243,35 @@ mod test {
             TokenTypes::IDENT("ten".to_string()),
             TokenTypes::RPAREN,
             TokenTypes::SEMICOLON,
+            TokenTypes::BANG,
+            TokenTypes::MINUS,
+            TokenTypes::SLASH,
+            TokenTypes::ASTERISK,
+            TokenTypes::INT("5".to_string()),
+            TokenTypes::SEMICOLON,
+            TokenTypes::INT("5".to_string()),
+            TokenTypes::LT,
+            TokenTypes::INT("10".to_string()),
+            TokenTypes::GT,
+            TokenTypes::INT("5".to_string()),
+            TokenTypes::SEMICOLON,
+            TokenTypes::IF,
+            TokenTypes::LPAREN,
+            TokenTypes::INT("5".to_string()),
+            TokenTypes::LT,
+            TokenTypes::INT("10".to_string()),
+            TokenTypes::RPAREN,
+            TokenTypes::LBRACE,
+            TokenTypes::RETURN,
+            TokenTypes::TRUE,
+            TokenTypes::SEMICOLON,
+            TokenTypes::RBRACE,
+            TokenTypes::ELSE,
+            TokenTypes::LBRACE,
+            TokenTypes::RETURN,
+            TokenTypes::FALSE,
+            TokenTypes::SEMICOLON,
+            TokenTypes::RBRACE,
             TokenTypes::EOF,
             
         ];
