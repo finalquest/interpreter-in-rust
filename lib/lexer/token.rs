@@ -14,6 +14,8 @@ pub enum TokenTypes {
     SLASH,
     ASTERISK,
     BANG,
+    EQ,
+    NOT_EQ,
 
     // Delimiters
     COMMA,

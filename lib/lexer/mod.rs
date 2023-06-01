@@ -35,10 +35,19 @@ impl Lexer {
                 tokentype: TokenTypes::MINUS,
                 literal: self.ch.to_string(),
             },
-            '!' => Token {
-                tokentype: TokenTypes::BANG,
-                literal: self.ch.to_string(),
-            },
+            '!' => 
+                if self.look_ahead() == '=' {
+                    self.read_char();
+                    Token {
+                        tokentype: TokenTypes::NOT_EQ,
+                        literal: "!=".to_string(),
+                    }
+                } else {
+                    Token {
+                        tokentype: TokenTypes::BANG,
+                        literal: self.ch.to_string(),
+                    }
+                },
             '/' => Token {
                 tokentype: TokenTypes::SLASH,
                 literal: self.ch.to_string(),
@@ -55,10 +64,19 @@ impl Lexer {
                 tokentype: TokenTypes::GT,
                 literal: self.ch.to_string(),
             },
-            '=' => Token {
-                tokentype: TokenTypes::ASSIGN,
-                literal: self.ch.to_string(),
-            },
+            '=' => 
+                if self.look_ahead() == '=' {
+                    self.read_char();
+                    Token {
+                        tokentype: TokenTypes::EQ,
+                        literal: "==".to_string(),
+                    }
+                } else {
+                    Token {
+                        tokentype: TokenTypes::ASSIGN,
+                        literal: self.ch.to_string(),
+                    }
+                },
             ';' => Token {
                 tokentype: TokenTypes::SEMICOLON,
                 literal: self.ch.to_string(),
@@ -123,6 +141,14 @@ impl Lexer {
         }
         self.position = self.read_position;
         self.read_position += 1;
+    }
+
+    fn look_ahead(&mut self) -> char {
+        if self.read_position >= self.input.len() {
+            return '\0';
+        } else {
+            return self.input.chars().nth(self.read_position).unwrap();
+        }
     }
 
     fn read_identifier(&mut self) -> String {
@@ -203,6 +229,7 @@ if (5 < 10) {
    } else {
        return false;
 }
+10 == 10; 10 != 9;
 ";
 
         let mut lexer = Lexer::new(input);
@@ -272,6 +299,14 @@ if (5 < 10) {
             TokenTypes::FALSE,
             TokenTypes::SEMICOLON,
             TokenTypes::RBRACE,
+            TokenTypes::INT("10".to_string()),
+            TokenTypes::EQ,
+            TokenTypes::INT("10".to_string()),
+            TokenTypes::SEMICOLON,
+            TokenTypes::INT("10".to_string()),
+            TokenTypes::NOT_EQ,
+            TokenTypes::INT("9".to_string()),
+            TokenTypes::SEMICOLON,
             TokenTypes::EOF,
             
         ];
