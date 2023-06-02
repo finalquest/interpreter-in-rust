@@ -3,6 +3,7 @@ extern crate monkey_lib;
 use std::io;
 
 use monkey_lib::lexer::*;
+use monkey_lib::lexer::token::*;
 
 fn main() {
     let mut buffer = String::new();
@@ -14,8 +15,8 @@ fn main() {
             Ok(_) => {
                 let mut l = Lexer::new(buffer.trim());
                 loop {
-                    let token: token::Token = l.next_token();
-                    if token.tokentype == token::TokenTypes::EOF {
+                    let token: Token = l.next_token();
+                    if token.tokentype == TokenTypes::EOF {
                         break;
                     }
                     println!("{{{:?}, {}}}", token.tokentype, token.literal);
