@@ -2,6 +2,7 @@ pub mod token;
 
 use crate::lexer::token::*;
 
+#[derive(PartialEq, Clone, Debug)]
 pub struct Lexer {
     input: String,
     position: usize,

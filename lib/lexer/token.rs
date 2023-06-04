@@ -38,6 +38,7 @@ pub enum TokenTypes {
     FALSE,
 }
 
+#[derive(PartialEq, Clone, Debug)]
 pub struct Token {
     pub tokentype: TokenTypes,
     pub literal: String,
