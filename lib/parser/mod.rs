@@ -3,11 +3,29 @@ use crate::lexer::token::*;
 use crate::ast::*;
 use crate::parser::Statement;
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(Clone, Debug)]
+pub enum ParseErrorType {
+    UnexpectedToken,
+}
+
+#[derive(Clone, Debug)]
+pub struct ParseError {
+    error_type: ParseErrorType,
+    msg: String,
+}
+
+impl ParseError {
+    fn new(e_type: ParseErrorType, msg: String) -> Self {
+        ParseError { error_type: e_type, msg }
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct Parser {
     lexer: Lexer,
     cur_token: Token,
     peek_token: Token,
+    errors: Vec<ParseError>,
     _private: (),
  }
 
@@ -20,6 +38,7 @@ impl Parser {
             cur_token: Token{literal: "".to_string(), tokentype:TokenTypes::EOF},
             peek_token: Token{literal: "".to_string(), tokentype:TokenTypes::EOF},
             lexer: input,
+            errors: vec![]
         };
 
         parser.next_token();
@@ -77,10 +96,11 @@ impl Parser {
     }
 
     fn expect_peek(&mut self, token_type: TokenTypes) -> bool {
-        if self.peek_token_is(token_type) {
+        if self.peek_token_is(&token_type) {
             self.next_token();
             return true;
         }
+        self.peek_error(token_type);
         return false;
     }
 
@@ -88,8 +108,15 @@ impl Parser {
         return self.cur_token.tokentype == token_type;
     }
 
-    fn peek_token_is(&mut self, token_type: TokenTypes) -> bool {
-        return self.peek_token.tokentype == token_type;
+    fn peek_token_is(&mut self, token_type: &TokenTypes) -> bool {
+        return self.peek_token.tokentype == *token_type;
+    }
+
+    fn peek_error(&mut self, token_type: TokenTypes) {
+        self.errors.push(ParseError::new(ParseErrorType::UnexpectedToken, format!(
+                "expected next token to be {:?}, got {:?} instead",
+                token_type, self.peek_token
+            )));
     }
 
 }
@@ -98,6 +125,26 @@ impl Parser {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    fn check_parse_errors(parser: &mut Parser) {
+        let errors = parser.errors.clone();
+
+        if errors.len() == 0 {
+            return;
+        }
+
+        println!("\n");
+
+        println!("parser has {} errors", errors.len());
+
+        for err in errors {
+            println!("parse error: {:?}", err);
+        }
+
+        println!("\n");
+
+        panic!("failed");
+    }
 
     #[test]
     fn test_parser_let() {
@@ -109,7 +156,7 @@ mod test {
         let mut parser = Parser::new(lexer);
 
         let program = parser.parse_program();
-
+        check_parse_errors(&mut parser);
 
         assert_eq!(program.len(), 3);
 
@@ -122,4 +169,5 @@ mod test {
                 ),
             ], program);
     }
+    
 }
