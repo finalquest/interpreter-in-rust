@@ -1,22 +1,14 @@
-use crate::lexer::token::*;
-
 pub type Program = Vec<Statement>;
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum Statement {
-    LetStatement {
-        token: Token,
-        name: Ident,
-        value: Expression,
-    }
+    LetStatement(Ident,Expression)
 }
 
-#[derive(PartialEq, Clone, Debug)]
-pub enum Ident {
-
-}
+#[derive(PartialEq, Debug, Eq, Clone)]
+pub struct Ident(pub String);
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum Expression {
-
+    Ident(Ident),
 }
