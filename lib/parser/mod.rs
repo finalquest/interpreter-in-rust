@@ -67,11 +67,11 @@ impl Parser {
     }
 
     fn parse_statement(&mut self) -> Option<Statement> {
-        if self.cur_token.tokentype == TokenTypes::LET {
-            return self.parse_let();
-        }
-
-        None
+        match self.cur_token.tokentype {
+            TokenTypes::LET => return self.parse_let(),
+            TokenTypes::RETURN => return self.parse_return(),
+            _ => return None
+        };
     }
 
     fn parse_let(&mut self) -> Option<Statement> {
@@ -90,9 +90,20 @@ impl Parser {
             self.next_token();
         }
 
-        let lt = Statement::LetStatement(ident,Expression::Ident(Ident("".to_string())));
+        let lt = Statement::Let(ident,Expression::Ident(Ident("".to_string())));
 
         return Some(lt);
+    }
+
+    fn parse_return(&mut self) -> Option<Statement> {
+        println!("parse_return");
+        self.next_token();
+
+        while !self.cur_token_is(TokenTypes::SEMICOLON) {
+            self.next_token();
+        }
+
+        return Some(Statement::Return(Expression::Ident(Ident("".to_string()))))
     }
 
     fn expect_peek(&mut self, token_type: TokenTypes) -> bool {
@@ -161,13 +172,34 @@ mod test {
         assert_eq!(program.len(), 3);
 
         assert_eq!(vec![
-                Statement::LetStatement(Ident(String::from("x")), Expression::Ident(Ident(String::from("")))),
-                Statement::LetStatement(Ident(String::from("y")), Expression::Ident(Ident(String::from("")))),
-                Statement::LetStatement(
+                Statement::Let(Ident(String::from("x")), Expression::Ident(Ident(String::from("")))),
+                Statement::Let(Ident(String::from("y")), Expression::Ident(Ident(String::from("")))),
+                Statement::Let(
                     Ident(String::from("foobar")),
                     Expression::Ident(Ident(String::from("")))
                 ),
             ], program);
     }
     
+    #[test]
+    fn test_parser_return() {
+        let input = "
+            return 5;
+            return 10;
+            return 838383;";
+        let lexer = Lexer::new(input);
+        let mut parser = Parser::new(lexer);
+
+        let program = parser.parse_program();
+        check_parse_errors(&mut parser);
+
+        assert_eq!(program.len(), 3);
+
+        assert_eq!(vec![
+                Statement::Return(Expression::Ident(Ident(String::from("")))),
+                Statement::Return(Expression::Ident(Ident(String::from("")))),
+                Statement::Return(Expression::Ident(Ident(String::from("")))
+                ),
+            ], program);
+    }
 }

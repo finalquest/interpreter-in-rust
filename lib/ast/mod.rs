@@ -2,7 +2,8 @@ pub type Program = Vec<Statement>;
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum Statement {
-    LetStatement(Ident,Expression)
+    Let(Ident,Expression),
+    Return(Expression)
 }
 
 #[derive(PartialEq, Debug, Eq, Clone)]
