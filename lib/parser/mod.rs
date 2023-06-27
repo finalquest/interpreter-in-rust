@@ -107,7 +107,7 @@ impl Parser {
     }
 
     fn parse_expression_statement(&mut self) -> Option<Statement> {
-        let expression = self.parse_exression("LOWEST".to_string());
+        let expression = self.parse_exression(Precedence::Lowest);
 
         if self.peek_token_is(&TokenTypes::SEMICOLON) {
             self.next_token();
@@ -117,7 +117,7 @@ impl Parser {
     
     }
 
-    fn parse_exression(&mut self, _precedence: String) -> Option<Expression> {
+    fn parse_exression(&mut self, _precedence: Precedence) -> Option<Expression> {
 
         match self.cur_token.tokentype {
             TokenTypes::IDENT(_) => return Some(Expression::Ident(Ident(self.cur_token.literal.to_string()))),
