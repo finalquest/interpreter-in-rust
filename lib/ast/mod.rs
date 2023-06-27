@@ -7,6 +7,12 @@ pub enum Statement {
     Expression(Expression),
 }
 
+#[derive(PartialEq, Clone, Debug)]
+pub enum Prefix {
+    Not,
+    Minus,
+}
+
 #[derive(PartialEq, Debug, Eq, Clone)]
 pub struct Ident(pub String);
 
@@ -14,6 +20,7 @@ pub struct Ident(pub String);
 pub enum Expression {
     Ident(Ident),
     IntegerLiteral(i64),
+    Prefix(Prefix, Box<Expression>),
 }
 
 #[derive(PartialEq, PartialOrd, Debug, Clone)]

@@ -114,7 +114,6 @@ impl Parser {
         }
 
         return Some(Statement::Expression(expression.unwrap()));
-    
     }
 
     fn parse_exression(&mut self, _precedence: Precedence) -> Option<Expression> {
@@ -122,7 +121,23 @@ impl Parser {
         match self.cur_token.tokentype {
             TokenTypes::IDENT(_) => return Some(Expression::Ident(Ident(self.cur_token.literal.to_string()))),
             TokenTypes::INT(ref mut int) => return Some(Expression::IntegerLiteral(int.clone())),
+            TokenTypes::BANG | TokenTypes::MINUS => return self.parse_prefix_expression(),
             _ => return None
+        }
+    }
+
+    fn parse_prefix_expression(&mut self) -> Option<Expression> {
+        let prefix = match self.cur_token.tokentype {
+            TokenTypes::BANG => Prefix::Not,
+            TokenTypes::MINUS => Prefix::Minus,
+            _ => return None
+        };
+
+        self.next_token();
+        let right = self.parse_exression(Precedence::Prefix);
+        match right {
+            Some(r) => return Some(Expression::Prefix(prefix, Box::new(r))),
+            None => return None
         }
     }
 
@@ -253,5 +268,27 @@ mod test {
         assert_eq!(vec![
                 Statement::Expression(Expression::IntegerLiteral(5)),
             ], program);
+    }
+
+    #[test]
+    fn test_parse_prefix_expression() {
+        let tests = vec![
+            (
+                "!5;",
+                Statement::Expression(Expression::Prefix(Prefix::Not, Box::new(Expression::IntegerLiteral(5)))),
+            ),
+            (
+                "-15;",
+                Statement::Expression(Expression::Prefix(Prefix::Minus, Box::new(Expression::IntegerLiteral(15)))),
+            )
+        ];
+
+        for (input, expect) in tests {
+            let mut parser = Parser::new(Lexer::new(input));
+            let program = parser.parse_program();
+
+            check_parse_errors(&mut parser);
+            assert_eq!(vec![expect], program);
+        }
     }
 }
