@@ -13,6 +13,7 @@ pub struct Ident(pub String);
 #[derive(PartialEq, Clone, Debug)]
 pub enum Expression {
     Ident(Ident),
+    IntegerLiteral(i64),
 }
 
 #[derive(PartialEq, PartialOrd, Debug, Clone)]

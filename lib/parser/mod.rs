@@ -121,6 +121,7 @@ impl Parser {
 
         match self.cur_token.tokentype {
             TokenTypes::IDENT(_) => return Some(Expression::Ident(Ident(self.cur_token.literal.to_string()))),
+            TokenTypes::INT(ref mut int) => return Some(Expression::IntegerLiteral(int.clone())),
             _ => return None
         }
     }
@@ -235,6 +236,22 @@ mod test {
 
         assert_eq!(vec![
                 Statement::Expression(Expression::Ident(Ident(String::from("foobar")))),
+            ], program);
+    }
+
+    #[test]
+    fn test_integer_literal() {
+        let input = "5;";
+        let lexer = Lexer::new(input);
+        let mut parser = Parser::new(lexer);
+
+        let program = parser.parse_program();
+        check_parse_errors(&mut parser);
+
+        assert_eq!(program.len(), 1);
+
+        assert_eq!(vec![
+                Statement::Expression(Expression::IntegerLiteral(5)),
             ], program);
     }
 }

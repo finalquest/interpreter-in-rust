@@ -120,7 +120,7 @@ impl Lexer {
                     let literal = self.read_number();
                     return Token {
                         tokentype: TokenTypes::INT(literal.clone()),
-                        literal
+                        literal: literal.to_string(),
                     }
                 }
                 
@@ -160,12 +160,12 @@ impl Lexer {
         return self.input[pos..self.position].to_string();
     }
 
-    fn read_number(&mut self) -> String {
+    fn read_number(&mut self) -> i64 {
         let pos = self.position;
         while self.ch.is_numeric() {
             self.read_char();
         }
-        return self.input[pos..self.position].to_string();
+        return self.input[pos..self.position].parse::<i64>().unwrap();
     }
 
     fn lookup_builtin(lit: &String) -> TokenTypes {
@@ -238,12 +238,12 @@ if (5 < 10) {
             TokenTypes::LET,
             TokenTypes::IDENT("five".to_string()),
             TokenTypes::ASSIGN,
-            TokenTypes::INT("5".to_string()),
+            TokenTypes::INT(5),
             TokenTypes::SEMICOLON,
             TokenTypes::LET,
             TokenTypes::IDENT("ten".to_string()),
             TokenTypes::ASSIGN,
-            TokenTypes::INT("10".to_string()),
+            TokenTypes::INT(10),
             TokenTypes::SEMICOLON,
             TokenTypes::LET,
             TokenTypes::IDENT("add".to_string()),
@@ -275,19 +275,19 @@ if (5 < 10) {
             TokenTypes::MINUS,
             TokenTypes::SLASH,
             TokenTypes::ASTERISK,
-            TokenTypes::INT("5".to_string()),
+            TokenTypes::INT(5),
             TokenTypes::SEMICOLON,
-            TokenTypes::INT("5".to_string()),
+            TokenTypes::INT(5),
             TokenTypes::LT,
-            TokenTypes::INT("10".to_string()),
+            TokenTypes::INT(10),
             TokenTypes::GT,
-            TokenTypes::INT("5".to_string()),
+            TokenTypes::INT(5),
             TokenTypes::SEMICOLON,
             TokenTypes::IF,
             TokenTypes::LPAREN,
-            TokenTypes::INT("5".to_string()),
+            TokenTypes::INT(5),
             TokenTypes::LT,
-            TokenTypes::INT("10".to_string()),
+            TokenTypes::INT(10),
             TokenTypes::RPAREN,
             TokenTypes::LBRACE,
             TokenTypes::RETURN,
@@ -300,13 +300,13 @@ if (5 < 10) {
             TokenTypes::FALSE,
             TokenTypes::SEMICOLON,
             TokenTypes::RBRACE,
-            TokenTypes::INT("10".to_string()),
+            TokenTypes::INT(10),
             TokenTypes::EQ,
-            TokenTypes::INT("10".to_string()),
+            TokenTypes::INT(10),
             TokenTypes::SEMICOLON,
-            TokenTypes::INT("10".to_string()),
+            TokenTypes::INT(10),
             TokenTypes::NOT_EQ,
-            TokenTypes::INT("9".to_string()),
+            TokenTypes::INT(9),
             TokenTypes::SEMICOLON,
             TokenTypes::EOF,
             
